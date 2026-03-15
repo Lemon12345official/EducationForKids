@@ -1,61 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Game Hub</title>
-</head>
-<body>
+    <title>SGS</title>
 
-    <h1>Game Hub</h1>
-
-    <div id="gameGrid"></div>
-    <div id="emptyMessage">No games added yet</div>
-
-    <script>
-        async function loadGames() {
-            try {
-                const response = await fetch("games/");
-                const text = await response.text();
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, "text/html");
-
-                const links = [...doc.querySelectorAll("a")];
-
-                const folders = links
-                    .map(a => a.getAttribute("href"))
-                    .filter(h => h.endsWith("/") && h !== "../");
-
-                const grid = document.getElementById("gameGrid");
-                const empty = document.getElementById("emptyMessage");
-
-                if (folders.length === 0) {
-                    empty.style.display = "block";
-                    return;
-                }
-
-                empty.style.display = "none";
-
-                folders.forEach(folder => {
-                    const name = folder.replace("/", "");
-
-                    const card = document.createElement("div");
-                    card.className = "gameCard";
-                    card.innerText = name;
-
-                    card.onclick = () => {
-                        window.location.href = "games/" + name + "/index.html";
-                    };
-
-                    grid.appendChild(card);
-                });
-
-            } catch (err) {
-                console.log("Directory listing not available yet.");
-            }
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #0d0b14;
+            color: #e8e8f5;
         }
 
-        loadGames();
-    </script>
+        /* Top Bar */
+        .topbar {
+            width: 100%;
+            padding: 18px 0;
+            background: #1a1624;
+            border-bottom: 2px solid #2e2940;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(80, 60, 120, 0.35);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dcd6ff;
+            text-shadow: 0 0 12px rgba(120, 90, 255, 0.4);
+            letter-spacing: 2px;
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            margin: 60px auto;
+            width: 90%;
+            max-width: 1100px;
+            text-align: center;
+        }
+
+        .placeholderBox {
+            margin: 80px auto;
+            padding: 40px;
+            width: 80%;
+            max-width: 600px;
+            background: rgba(30, 25, 45, 0.85);
+            border-radius: 18px;
+            border: 1px solid #3a3450;
+            box-shadow: 0 0 25px rgba(100, 80, 150, 0.35);
+        }
+
+        .placeholderBox h2 {
+            font-size: 22px;
+            color: #cfc9ff;
+            margin-bottom: 10px;
+        }
+
+        .placeholderBox p {
+            font-size: 15px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="title">SGS</div>
+    </div>
+
+    <div class="dashboard">
+        <div class="placeholderBox">
+            <h2>No Games Added Yet</h2>
+            <p>Your game dashboard will appear here once you add folders inside /games.</p>
+        </div>
+    </div>
 
 </body>
 </html>

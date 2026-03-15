@@ -104,37 +104,28 @@
     <div class="dashboard">
         <div class="placeholderBox">
             <h2>No Games Added Yet</h2>
-            <p>Your game dashboard will appear here once you add folders inside /games.</p>
+            <p>Your game dashboard will appear here once you add entries to games.json.</p>
         </div>
     </div>
 
-    <!-- ⭐ GAME LOADER + SEARCH SYSTEM ⭐ -->
+    <!-- ⭐ JSON GAME LOADER + SEARCH ⭐ -->
     <script>
     async function loadGames() {
         try {
-            const response = await fetch("games/");
-            const text = await response.text();
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, "text/html");
-
-            const links = [...doc.querySelectorAll("a")];
-
-            const folders = links
-                .map(a => a.getAttribute("href"))
-                .filter(h => h.endsWith("/") && h !== "../");
+            const response = await fetch("games.json");
+            const games = await response.json();
 
             const dashboard = document.querySelector(".dashboard");
 
-            if (folders.length === 0) {
+            if (!games || games.length === 0) {
                 return;
             }
 
-            // Remove placeholder box
+            // Remove placeholder
             const placeholder = document.querySelector(".placeholderBox");
             if (placeholder) placeholder.remove();
 
-            // Create grid container
+            // Create grid
             const grid = document.createElement("div");
             grid.id = "gameGrid";
             grid.style.display = "grid";
@@ -144,9 +135,7 @@
 
             dashboard.appendChild(grid);
 
-            folders.forEach(folder => {
-                const name = folder.replace("/", "");
-
+            games.forEach(name => {
                 const card = document.createElement("div");
                 card.className = "gameCard";
                 card.dataset.name = name.toLowerCase();
@@ -185,7 +174,7 @@
             });
 
         } catch (err) {
-            console.log("Directory listing not available yet.");
+            console.log("Error loading games.json:", err);
         }
     }
 
@@ -205,4 +194,3 @@
 
 </body>
 </html>
-

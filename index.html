@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Hub</title>
+</head>
+<body>
 
+    <h1>Game Hub</h1>
+
+    <div id="gameGrid"></div>
+    <div id="emptyMessage">No games added yet</div>
+
+    <script>
+        async function loadGames() {
+            try {
+                const response = await fetch("games/");
+                const text = await response.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
+
+                const links = [...doc.querySelectorAll("a")];
+
+                const folders = links
+                    .map(a => a.getAttribute("href"))
+                    .filter(h => h.endsWith("/") && h !== "../");
+
+                const grid = document.getElementById("gameGrid");
+                const empty = document.getElementById("emptyMessage");
+
+                if (folders.length === 0) {
+                    empty.style.display = "block";
+                    return;
+                }
+
+                empty.style.display = "none";
+
+                folders.forEach(folder => {
+                    const name = folder.replace("/", "");
+
+                    const card = document.createElement("div");
+                    card.className = "gameCard";
+                    card.innerText = name;
+
+                    card.onclick = () => {
+                        window.location.href = "games/" + name + "/index.html";
+                    };
+
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.log("Directory listing not available yet.");
+            }
+        }
+
+        loadGames();
+    </script>
+
+</body>
+</html>

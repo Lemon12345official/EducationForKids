@@ -22,6 +22,7 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 0 20px rgba(80, 60, 120, 0.35);
+            position: relative;
         }
 
         .title {
@@ -32,6 +33,31 @@
             letter-spacing: 2px;
         }
 
+        /* Search Bar */
+        .searchBox {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .searchInput {
+            padding: 10px 14px;
+            width: 220px;
+            border-radius: 10px;
+            border: 1px solid #3a3450;
+            background: #1e1a2d;
+            color: #e8e8ff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .searchInput:focus {
+            border-color: #6a5aff;
+            box-shadow: 0 0 10px rgba(120, 90, 255, 0.4);
+        }
+
         /* Dashboard Container */
         .dashboard {
             margin: 60px auto;
@@ -40,6 +66,7 @@
             text-align: center;
         }
 
+        /* Placeholder Box */
         .placeholderBox {
             margin: 80px auto;
             padding: 40px;
@@ -68,6 +95,10 @@
 
     <div class="topbar">
         <div class="title">SGS</div>
+
+        <div class="searchBox">
+            <input type="text" id="searchInput" class="searchInput" placeholder="Search games...">
+        </div>
     </div>
 
     <div class="dashboard">
@@ -77,5 +108,101 @@
         </div>
     </div>
 
+    <!-- ⭐ GAME LOADER + SEARCH SYSTEM ⭐ -->
+    <script>
+    async function loadGames() {
+        try {
+            const response = await fetch("games/");
+            const text = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, "text/html");
+
+            const links = [...doc.querySelectorAll("a")];
+
+            const folders = links
+                .map(a => a.getAttribute("href"))
+                .filter(h => h.endsWith("/") && h !== "../");
+
+            const dashboard = document.querySelector(".dashboard");
+
+            if (folders.length === 0) {
+                return;
+            }
+
+            // Remove placeholder box
+            const placeholder = document.querySelector(".placeholderBox");
+            if (placeholder) placeholder.remove();
+
+            // Create grid container
+            const grid = document.createElement("div");
+            grid.id = "gameGrid";
+            grid.style.display = "grid";
+            grid.style.gridTemplateColumns = "repeat(auto-fill, minmax(180px, 1fr))";
+            grid.style.gap = "25px";
+            grid.style.marginTop = "40px";
+
+            dashboard.appendChild(grid);
+
+            folders.forEach(folder => {
+                const name = folder.replace("/", "");
+
+                const card = document.createElement("div");
+                card.className = "gameCard";
+                card.dataset.name = name.toLowerCase();
+
+                card.style.background = "rgba(30, 25, 45, 0.85)";
+                card.style.borderRadius = "16px";
+                card.style.padding = "20px";
+                card.style.height = "150px";
+                card.style.display = "flex";
+                card.style.justifyContent = "center";
+                card.style.alignItems = "center";
+                card.style.color = "#e8e8ff";
+                card.style.fontSize = "18px";
+                card.style.fontWeight = "500";
+                card.style.cursor = "pointer";
+                card.style.boxShadow = "0 0 15px rgba(100, 80, 150, 0.25)";
+                card.style.transition = "0.2s";
+
+                card.onmouseover = () => {
+                    card.style.transform = "translateY(-6px)";
+                    card.style.boxShadow = "0 0 25px rgba(120, 90, 255, 0.45)";
+                };
+
+                card.onmouseout = () => {
+                    card.style.transform = "translateY(0)";
+                    card.style.boxShadow = "0 0 15px rgba(100, 80, 150, 0.25)";
+                };
+
+                card.onclick = () => {
+                    window.location.href = "games/" + name + "/index.html";
+                };
+
+                card.innerText = name;
+
+                grid.appendChild(card);
+            });
+
+        } catch (err) {
+            console.log("Directory listing not available yet.");
+        }
+    }
+
+    // ⭐ SEARCH SYSTEM ⭐
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        const cards = document.querySelectorAll(".gameCard");
+
+        cards.forEach(card => {
+            const name = card.dataset.name;
+            card.style.display = name.includes(query) ? "flex" : "none";
+        });
+    });
+
+    loadGames();
+    </script>
+
 </body>
 </html>
+

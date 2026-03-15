@@ -1,388 +1,515 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameHub - Your Gaming Universe</title>
+    <title>Idle Breakout</title>
+
     <style>
-        * {
+        /* ===== ANIMATED BACKGROUND ===== */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 0;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #4ecdc4;
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #e8e8ff;
             text-align: center;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%231a1a2e" width="1200" height="800"/><circle cx="200" cy="200" r="3" fill="%23fff" opacity="0.8"/><circle cx="800" cy="300" r="2" fill="%23fff" opacity="0.6"/><circle cx="600" cy="150" r="4" fill="%23fff" opacity="0.9"/><circle cx="1000" cy="400" r="2" fill="%23fff" opacity="0.7"/></svg>') no-repeat center;
-            background-size: cover;
+            background: linear-gradient(120deg, #0a0a14, #101026, #0d0d1c);
+            background-size: 400% 400%;
+            animation: bgShift 18s ease infinite;
         }
 
-        .hero-content h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 20px #ff6b6b; }
-            to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
+        h1 {
+            margin-top: 20px;
+            font-size: 30px;
+            font-weight: 600;
+            color: #dcdcff;
+            text-shadow: 0 0 12px #5a5aff;
         }
 
-        .hero-content p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+        /* ===== HUD ===== */
+        #hud {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(20, 20, 35, 0.8);
+            border-radius: 14px;
+            width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 0 18px rgba(80, 80, 255, 0.25);
+            backdrop-filter: blur(6px);
         }
 
-        .cta-button {
+        #hud span {
             display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 6px 10px;
+            padding: 8px 14px;
+            background: rgba(40, 40, 70, 0.8);
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: inset 0 0 8px rgba(100, 100, 255, 0.25);
         }
 
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        /* ===== CANVAS ===== */
+        #gameCanvas {
+            background: #1a1a28;
+            margin-top: 20px;
+            border-radius: 14px;
+            border: 2px solid #2e2e44;
+            box-shadow: 0 0 20px rgba(90, 90, 255, 0.25);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 90%;
+            max-width: 700px;
+            height: 450px;
         }
 
-        /* Games Section */
-        .games {
-            padding: 5rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* ===== SECTIONS ===== */
+        .section {
+            margin-top: 22px;
+            padding: 18px;
+            background: rgba(25, 25, 45, 0.85);
+            border-radius: 14px;
+            width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 0 18px rgba(80, 80, 255, 0.25);
+            backdrop-filter: blur(6px);
         }
 
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .section h2 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            color: #dcdcff;
+            text-shadow: 0 0 8px #5a5aff;
         }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .game-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .game-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-
-        .game-info {
-            padding: 1.5rem;
-        }
-
-        .game-title {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .game-description {
-            opacity: 0.8;
-            margin-bottom: 1rem;
-        }
-
-        .play-button {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        /* ===== BUTTONS ===== */
+        button {
+            padding: 10px 18px;
+            margin: 6px;
+            background: linear-gradient(180deg, #2d2d4a, #24243a);
+            color: #e8e8ff;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 25px;
-            color: white;
+            border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.3s;
+            font-size: 14px;
+            transition: 0.15s;
+            box-shadow: 0 0 10px rgba(100, 100, 255, 0.25);
         }
 
-        .play-button:hover {
-            transform: scale(1.05);
+        button:hover {
+            background: linear-gradient(180deg, #3a3a5c, #2d2d48);
+            transform: translateY(-2px);
+            box-shadow: 0 0 14px rgba(120, 120, 255, 0.35);
         }
 
-        /* Features Section */
-        .features {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5rem 2rem;
+        button:active {
+            transform: translateY(0px);
+            background: #2a2a44;
         }
 
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+        /* ===== FLOATING DAMAGE TEXT ===== */
+        .floatText {
+            position: absolute;
+            color: #ffffff;
+            font-size: 16px;
+            text-shadow: 0 0 8px #a0a0ff;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
         }
 
-        .feature {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            background: #000;
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        .social-links {
-            margin-bottom: 2rem;
-        }
-
-        .social-links a {
-            color: #fff;
-            font-size: 2rem;
-            margin: 0 1rem;
-            transition: color 0.3s;
-        }
-
-        .social-links a:hover {
-            color: #4ecdc4;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav-links {
-                display: none;
-            }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0px); }
+            100% { opacity: 0; transform: translateY(-25px); }
         }
     </style>
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <div class="logo">🎮 GameHub</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#games">Games</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>Welcome to GameHub</h1>
-            <p>Discover amazing games and join millions of players</p>
-            <a href="#games" class="cta-button">Explore Games</a>
-        </div>
-    </section>
+    <h1>Idle Breakout</h1>
 
-    <!-- Games Section -->
-    <section class="games" id="games">
-        <h2 class="section-title">Popular Games</h2>
-        <div class="games-grid">
-            <div class="game-card">
-                <div class="game-image">🚀</div>
-                <div class="game-info">
-                    <h3 class="game-title">Space Adventure</h3>
-                    <p class="game-description">Explore the galaxy in this epic space adventure game.</p>
-                    <button class="play-button" onclick="playGame('space')">Play Now</button>
-                </div>
-            </div>
-            
-            <div class="game-card">
-                <div class="game-image">⚔️</div>
-                <div class="game-info">
-                    <h3 class="game-title">Knight's Quest</h3>
-                    <p class="game-description">Embark on a medieval adventure filled with dragons and magic.</p>
-                    <button class="play-button" onclick="playGame('knight')">Play Now</button>
-                </div>
-            </div>
-            
-            <div class="game-card">
-                <div class="game-image">🏎️</div>
-                <div class="game-info">
-                    <h3 class="game-title">Racing Thunder</h3>
-                    <p class="game-description">Feel the speed in this high-octane racing experience.</p>
-                    <button class="play-button" onclick="playGame('racing')">Play Now</button>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div id="hud">
+        <span id="moneyDisplay">Money: 0</span>
+        <span id="levelDisplay">Level: 1</span>
+        <span id="damageDisplay">Damage: 1</span>
+        <span id="clickDisplay">Click: x2</span>
+        <span id="totalDamageDisplay">Total Damage: 0</span>
+        <span id="goldDisplay">Gold: 0</span>
+    </div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <h2 class="section-title">Why Choose GameHub?</h2>
-        <div class="features-grid">
-            <div class="feature">
-                <div class="feature-icon">🎯</div>
-                <h3>Wide Selection</h3>
-                <p>Hundreds of games across all genres</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">⚡</div>
-                <h3>Instant Play</h3>
-                <p>No downloads required - play instantly</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🏆</div>
-                <h3>Leaderboards</h3>
-                <p>Compete with players worldwide</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🎮</div>
-                <h3>Multiplayer</h3>
-                <p>Play with friends or make new ones</p>
-            </div>
-        </div>
-    </section>
+    <canvas id="gameCanvas"></canvas>
 
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="social-links">
-            <a href="#">📘</a>
-            <a href="#">🐦</a>
-            <a href="#">📷</a>
-            <a href="#">🎥</a>
-        </div>
-        <p>&copy; 2025 GameHub. All rights reserved. | Contact: info@gamehub.com</p>
-    </footer>
+    <div class="section">
+        <h2>Balls</h2>
+        <button id="buyBasicBall">Buy Basic Ball (Cost: 8)</button>
+        <button id="buyFastBall">Buy Fast Ball (Cost: 30)</button>
+        <button id="buyHeavyBall">Buy Heavy Ball (Cost: 60)</button>
+    </div>
+
+    <div class="section">
+        <h2>Upgrades (Money)</h2>
+        <button id="upgradeDamage">Upgrade Damage (Cost: 15)</button>
+        <button id="upgradeMoneyPerHit">Upgrade Money/Hit (Cost: 30)</button>
+        <button id="upgradeClick">Click Upgrade (Cost: 20)</button>
+    </div>
+
+    <div class="section">
+        <h2>Prestige</h2>
+        <button id="prestigeButton">Prestige (1 Gold per 5000 Total Damage)</button>
+
+        <h2>Gold Upgrades</h2>
+        <button id="goldUpgradeDamage">+10% Global Damage (Cost: 1 Gold)</button>
+        <button id="goldUpgradeMoney">+20% Money/Hit (Cost: 1 Gold)</button>
+        <button id="goldUpgradeStartBall">+1 Starting Basic Ball (Cost: 2 Gold)</button>
+    </div>
 
     <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
+        /* ===== GAME LOGIC ===== */
 
-                    behavior: 'smooth'
-                });
-            });
-        });
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-        // Game play function
-        function playGame(gameType) {
-            alert(`🎮 Starting ${gameType} game... This would normally load your game!`);
-            // Here you would typically redirect to the actual game or load it
-            console.log(`Game loaded: ${gameType}`);
+        canvas.width = 700;
+        canvas.height = 450;
+
+        let balls = [];
+        let bricks = [];
+        let level = 1;
+
+        let money = 0;
+        let moneyPerHit = 1;
+        let moneyPerHitLevel = 1;
+
+        let baseDamage = 1;
+        let damageLevel = 1;
+
+        let clickMultiplier = 2;
+        let clickUpgradeCost = 20;
+
+        let totalDamage = 0;
+        let gold = 0;
+
+        let basicBallCost = 8;
+        let fastBallCost = 30;
+        let heavyBallCost = 60;
+
+        let damageUpgradeCost = 15;
+        let moneyPerHitUpgradeCost = 30;
+
+        let goldDamageBonusLevel = 0;
+        let goldMoneyBonusLevel = 0;
+        let goldStartBallLevel = 0;
+
+        /* ===== FLOATING TEXT ===== */
+        function spawnFloatText(x, y, text) {
+            const div = document.createElement("div");
+            div.className = "floatText";
+            div.innerText = text;
+            div.style.left = x + "px";
+            div.style.top = y + "px";
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 800);
         }
 
-        // Add parallax effect
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-        });
+        /* ===== BALL TYPES ===== */
+        function createBasicBall() {
+            return {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                dx: (Math.random() * 2 - 1) * 2,
+                dy: (Math.random() * 2 - 1) * 2,
+                radius: 5,
+                type: "basic"
+            };
+        }
 
-        // Add animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
+        function createFastBall() {
+            return {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                dx: (Math.random() * 2 - 1) * 3,
+                dy: (Math.random() * 2 - 1) * 3,
+                radius: 4,
+                type: "fast"
+            };
+        }
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+        function createHeavyBall() {
+            return {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                dx: (Math.random() * 2 - 1) * 1.5,
+                dy: (Math.random() * 2 - 1) * 1.5,
+                radius: 6,
+                type: "heavy"
+            };
+        }
+
+        function getBallDamage(ball) {
+            let dmg = baseDamage;
+
+            if (ball.type === "fast") dmg *= 0.8;
+            if (ball.type === "heavy") dmg *= 2;
+
+            dmg *= (1 + goldDamageBonusLevel * 0.10);
+            return Math.max(1, Math.floor(dmg));
+        }
+
+        function getMoneyPerHit() {
+            return moneyPerHit * (1 + goldMoneyBonusLevel * 0.20);
+        }
+
+        /* ===== BRICK GENERATION (SAFE) ===== */
+        function createBricksForLevel(lvl) {
+            bricks = [];
+            const rows = 4;
+            const cols = 8;
+            const bw = 70;
+            const bh = 30;
+            const ox = 20;
+            const oy = 20;
+            const pad = 10;
+
+            let baseHP = lvl === 1 ? 1 : lvl === 2 ? 4 : Math.floor(4 * Math.pow(1.6, lvl - 2));
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    bricks.push({
+                        x: ox + c * (bw + pad),
+                        y: oy + r * (bh + pad),
+                        width: bw,
+                        height: bh,
+                        hp: baseHP
+                    });
+                }
+            }
+        }
+
+        /* ===== CLICK DAMAGE ===== */
+        canvas.addEventListener("click", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            bricks.forEach(b => {
+                if (b.hp > 0 &&
+                    mx > b.x && mx < b.x + b.width &&
+                    my > b.y && my < b.y + b.height) {
+
+                    const dmg = Math.floor(baseDamage * clickMultiplier);
+                    b.hp -= dmg;
+                    totalDamage += dmg;
+                    money += getMoneyPerHit() * dmg;
+
+                    spawnFloatText(e.clientX, e.clientY, "-" + dmg);
                 }
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.game-card, .feature').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
         });
+
+        /* ===== INIT ===== */
+        function initGame() {
+            balls = [];
+            const startBalls = 1 + goldStartBallLevel;
+            for (let i = 0; i < startBalls; i++) {
+                balls.push(createBasicBall());
+            }
+            createBricksForLevel(level);
+            updateHUD();
+        }
+
+        /* ===== HUD ===== */
+        function updateHUD() {
+            moneyDisplay.innerText = "Money: " + Math.floor(money);
+            levelDisplay.innerText = "Level: " + level;
+            damageDisplay.innerText = "Damage: " + baseDamage;
+            clickDisplay.innerText = "Click: x" + clickMultiplier.toFixed(2);
+            totalDamageDisplay.innerText = "Total Damage: " + Math.floor(totalDamage);
+            goldDisplay.innerText = "Gold: " + gold;
+
+            buyBasicBall.innerText = "Buy Basic Ball (Cost: " + Math.floor(basicBallCost) + ")";
+            buyFastBall.innerText = "Buy Fast Ball (Cost: " + Math.floor(fastBallCost) + ")";
+            buyHeavyBall.innerText = "Buy Heavy Ball (Cost: " + Math.floor(heavyBallCost) + ")";
+
+            upgradeDamage.innerText = "Upgrade Damage (Cost: " + Math.floor(damageUpgradeCost) + ")";
+            upgradeMoneyPerHit.innerText = "Upgrade Money/Hit (Cost: " + Math.floor(moneyPerHitUpgradeCost) + ")";
+            upgradeClick.innerText = "Click Upgrade (Cost: " + Math.floor(clickUpgradeCost) + ")";
+        }
+
+        /* ===== GAME LOOP ===== */
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw bricks
+            bricks.forEach(b => {
+                if (b.hp > 0) {
+                    ctx.fillStyle = "#6a4cff";
+                    ctx.fillRect(b.x, b.y, b.width, b.height);
+
+                    ctx.fillStyle = "#000";
+                    ctx.font = "12px Segoe UI";
+                    ctx.fillText(b.hp, b.x + b.width / 2 - 8, b.y + b.height / 2 + 4);
+                }
+            });
+
+            // Move balls
+            balls.forEach(ball => {
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) ball.dx *= -1;
+                if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) ball.dy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fillStyle =
+                    ball.type === "basic" ? "#ffffff" :
+                    ball.type === "fast" ? "#66aaff" :
+                    "#ffdd66";
+                ctx.fill();
+
+                bricks.forEach(b => {
+                    if (b.hp > 0 &&
+                        ball.x > b.x &&
+                        ball.x < b.x + b.width &&
+                        ball.y > b.y &&
+                        ball.y < b.y + b.height) {
+
+                        const dmg = getBallDamage(ball);
+                        b.hp -= dmg;
+                        totalDamage += dmg;
+                        money += getMoneyPerHit() * dmg;
+
+                        const left = ball.x - b.x;
+                        const right = (b.x + b.width) - ball.x;
+                        const top = ball.y - b.y;
+                        const bottom = (b.y + b.height) - ball.y;
+
+                        const minX = Math.min(left, right);
+                        const minY = Math.min(top, bottom);
+
+                        if (minX < minY) ball.dx *= -1;
+                        else ball.dy *= -1;
+                    }
+                });
+            });
+
+            // Level progression
+            if (bricks.every(b => b.hp <= 0)) {
+                level++;
+                createBricksForLevel(level);
+            }
+
+            updateHUD();
+            requestAnimationFrame(update);
+        }
+
+        /* ===== BUTTONS ===== */
+        buyBasicBall.onclick = () => {
+            if (money >= basicBallCost) {
+                money -= basicBallCost;
+                balls.push(createBasicBall());
+                basicBallCost *= 1.4;
+            }
+        };
+
+        buyFastBall.onclick = () => {
+            if (money >= fastBallCost) {
+                money -= fastBallCost;
+                balls.push(createFastBall());
+                fastBallCost *= 1.5;
+            }
+        };
+
+        buyHeavyBall.onclick = () => {
+            if (money >= heavyBallCost) {
+                money -= heavyBallCost;
+                balls.push(createHeavyBall());
+                heavyBallCost *= 1.6;
+            }
+        };
+
+        upgradeDamage.onclick = () => {
+            if (money >= damageUpgradeCost) {
+                money -= damageUpgradeCost;
+                damageLevel++;
+                baseDamage = 1 + damageLevel;
+                damageUpgradeCost *= 1.7;
+            }
+        };
+
+        upgradeMoneyPerHit.onclick = () => {
+            if (money >= moneyPerHitUpgradeCost) {
+                money -= moneyPerHitUpgradeCost;
+                moneyPerHitLevel++;
+                moneyPerHit = 1 + moneyPerHitLevel * 0.5;
+                moneyPerHitUpgradeCost *= 1.8;
+            }
+        };
+
+        upgradeClick.onclick = () => {
+            if (money >= clickUpgradeCost && clickMultiplier < 5) {
+                money -= clickUpgradeCost;
+                clickMultiplier += 0.25;
+                clickUpgradeCost *= 1.6;
+            }
+        };
+
+        prestigeButton.onclick = () => {
+            const earned = Math.floor(totalDamage / 5000);
+            if (earned <= 0) return;
+
+            gold += earned;
+
+            level = 1;
+            money = 0;
+            moneyPerHit = 1;
+            moneyPerHitLevel = 1;
+            baseDamage = 1;
+            damageLevel = 1;
+            totalDamage = 0;
+
+            basicBallCost = 8;
+            fastBallCost = 30;
+            heavyBallCost = 60;
+            damageUpgradeCost = 15;
+            moneyPerHitUpgradeCost = 30;
+            clickMultiplier = 2;
+            clickUpgradeCost = 20;
+
+            initGame();
+        };
+
+        goldUpgradeDamage.onclick = () => {
+            if (gold >= 1) {
+                gold--;
+                goldDamageBonusLevel++;
+            }
+        };
+
+        goldUpgradeMoney.onclick = () => {
+            if (gold >= 1) {
+                gold--;
+                goldMoneyBonusLevel++;
+            }
+        };
+
+        goldUpgradeStartBall.onclick = () => {
+            if (gold >= 2) {
+                gold -= 2;
+                goldStartBallLevel++;
+            }
+        };
+
+        // Start game
+        initGame();
+        update();
     </script>
+
 </body>
 </html>

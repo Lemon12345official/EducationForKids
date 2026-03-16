@@ -112,7 +112,8 @@
     <script>
     async function loadGames() {
         try {
-            const response = await fetch("games/games.json");
+            // FIXED PATH — dashboard is inside /games, so load local JSON
+            const response = await fetch("games.json");
             const games = await response.json();
 
             const dashboard = document.querySelector(".dashboard");
@@ -135,10 +136,11 @@
 
             dashboard.appendChild(grid);
 
-            games.forEach(name => {
+            // FIXED LOOP — use game.name and game.folder
+            games.forEach(game => {
                 const card = document.createElement("div");
                 card.className = "gameCard";
-                card.dataset.name = name.toLowerCase();
+                card.dataset.name = game.name.toLowerCase();
 
                 card.style.background = "rgba(30, 25, 45, 0.85)";
                 card.style.borderRadius = "16px";
@@ -164,11 +166,12 @@
                     card.style.boxShadow = "0 0 15px rgba(100, 80, 150, 0.25)";
                 };
 
+                // FIXED LINK — dashboard is already inside /games
                 card.onclick = () => {
-                    window.location.href = "games/" + name + "/index.html";
+                    window.location.href = game.folder + "/index.html";
                 };
 
-                card.innerText = name;
+                card.innerText = game.name;
 
                 grid.appendChild(card);
             });

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SGS</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #0d0b14;
+            color: #e8e8f5;
+        }
+
+        /* Top Bar */
+        .topbar {
+            width: 100%;
+            padding: 18px 0;
+            background: #1a1624;
+            border-bottom: 2px solid #2e2940;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(80, 60, 120, 0.35);
+            position: relative;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dcd6ff;
+            text-shadow: 0 0 12px rgba(120, 90, 255, 0.4);
+            letter-spacing: 2px;
+        }
+
+        /* Search Bar */
+        .searchBox {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .searchInput {
+            padding: 10px 14px;
+            width: 220px;
+            border-radius: 10px;
+            border: 1px solid #3a3450;
+            background: #1e1a2d;
+            color: #e8e8ff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .searchInput:focus {
+            border-color: #6a5aff;
+            box-shadow: 0 0 10px rgba(120, 90, 255, 0.4);
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            margin: 60px auto;
+            width: 90%;
+            max-width: 1100px;
+            text-align: center;
+        }
+
+        /* Placeholder Box */
+        .placeholderBox {
+            margin: 80px auto;
+            padding: 40px;
+            width: 80%;
+            max-width: 600px;
+            background: rgba(30, 25, 45, 0.85);
+            border-radius: 18px;
+            border: 1px solid #3a3450;
+            box-shadow: 0 0 25px rgba(100, 80, 150, 0.35);
+        }
+
+        .placeholderBox h2 {
+            font-size: 22px;
+            color: #cfc9ff;
+            margin-bottom: 10px;
+        }
+
+        .placeholderBox p {
+            font-size: 15px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="title">SGS</div>
+
+        <div class="searchBox">
+            <input type="text" id="searchInput" class="searchInput" placeholder="Search games...">
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="placeholderBox">
+            <h2>No Games Added Yet</h2>
+            <p>Your game dashboard will appear here once you add entries to games.json.</p>
+        </div>
+    </div>
+
+    <!-- ⭐ JSON GAME LOADER + SEARCH ⭐ -->
+    <script>
+    async function loadGames() {
+        try {
+            // FIXED PATH — dashboard is inside /games, so load local JSON
+            const response = await fetch("games.json");
+            const games = await response.json();
+
+            const dashboard = document.querySelector(".dashboard");
+
+            if (!games || games.length === 0) {
+                return;
+            }
+
+            // Remove placeholder
+            const placeholder = document.querySelector(".placeholderBox");
+            if (placeholder) placeholder.remove();
+
+            // Create grid
+            const grid = document.createElement("div");
+            grid.id = "gameGrid";
+            grid.style.display = "grid";
+            grid.style.gridTemplateColumns = "repeat(auto-fill, minmax(180px, 1fr))";
+            grid.style.gap = "25px";
+            grid.style.marginTop = "40px";
+
+            dashboard.appendChild(grid);
+
+            // FIXED LOOP — use game.name and game.folder
+            games.forEach(game => {
+                const card = document.createElement("div");
+                card.className = "gameCard";
+                card.dataset.name = game.name.toLowerCase();
+
+                card.style.background = "rgba(30, 25, 45, 0.85)";
+                card.style.borderRadius = "16px";
+                card.style.padding = "20px";
+                card.style.height = "150px";
+                card.style.display = "flex";
+                card.style.justifyContent = "center";
+                card.style.alignItems = "center";
+                card.style.color = "#e8e8ff";
+                card.style.fontSize = "18px";
+                card.style.fontWeight = "500";
+                card.style.cursor = "pointer";
+                card.style.boxShadow = "0 0 15px rgba(100, 80, 150, 0.25)";
+                card.style.transition = "0.2s";
+
+                card.onmouseover = () => {
+                    card.style.transform = "translateY(-6px)";
+                    card.style.boxShadow = "0 0 25px rgba(120, 90, 255, 0.45)";
+                };
+
+                card.onmouseout = () => {
+                    card.style.transform = "translateY(0)";
+                    card.style.boxShadow = "0 0 15px rgba(100, 80, 150, 0.25)";
+                };
+
+                // FIXED LINK — dashboard is already inside /games
+                card.onclick = () => {
+                    window.location.href = game.folder + "/index.html";
+                };
+
+                card.innerText = game.name;
+
+                grid.appendChild(card);
+            });
+
+        } catch (err) {
+            console.log("Error loading games.json:", err);
+        }
+    }
+
+    // ⭐ SEARCH SYSTEM ⭐
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        const cards = document.querySelectorAll(".gameCard");
+
+        cards.forEach(card => {
+            const name = card.dataset.name;
+            card.style.display = name.includes(query) ? "flex" : "none";
+        });
+    });
+
+    loadGames();
+    </script>
+
+</body>
+</html>

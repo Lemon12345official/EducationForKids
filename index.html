@@ -112,7 +112,7 @@
     <script>
     async function loadGames() {
         try {
-            const response = await fetch("games.json");
+            const response = await fetch("games/games.json");
             const games = await response.json();
 
             const dashboard = document.querySelector(".dashboard");
